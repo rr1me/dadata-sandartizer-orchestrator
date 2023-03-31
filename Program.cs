@@ -8,7 +8,7 @@ builder.Services.AddLogging(x => { x.AddFile("app.log", x => x.MinLevel = LogLev
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<RequestHandler>();
+builder.Services.AddScoped<RequestHandler>();
 
 builder.Services.AddCors(x => x.AddDefaultPolicy(x =>
 {
