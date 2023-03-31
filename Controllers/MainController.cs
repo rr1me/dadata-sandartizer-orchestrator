@@ -1,5 +1,7 @@
-﻿using dadataStandartizer.Handlers;
+﻿using System.Runtime.InteropServices;
+using dadataStandartizer.Handlers;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace dadataStandartizer.Controllers;
@@ -21,12 +23,22 @@ public class MainController : ControllerBase
 
         var addressInfo = await _requestHandler.HandleAddress(address);
 
-        var jTokenAddressInfo = JArray.Parse(addressInfo).First;
-        var resultField = jTokenAddressInfo["result"].ToString();
+        JToken jTokenAddressInfo;
+        try
+        {
+            jTokenAddressInfo = JArray.Parse(addressInfo).First;
+        }
+        catch (JsonReaderException)
+        {
+            var errorObj = JObject.Parse(addressInfo); // if we'll get error even here, it will be intercepted by middleware
+            var status = errorObj["status"].ToString();
+            var error = errorObj["error"].ToString();
+            var message = errorObj["message"].ToString();
 
-        if (string.IsNullOrEmpty(resultField))
-            return StatusCode(418, "No information has been provided at this address");
+            throw new ExternalException($"Dadata exception. Status: {status}. Error: {error}. Message: {message}");
+        }
         
-        return Ok(jTokenAddressInfo.ToString());
+        var resultField = jTokenAddressInfo["result"].ToString();
+        return string.IsNullOrEmpty(resultField) ? StatusCode(418, "No information has been provided at this address") : Ok(jTokenAddressInfo.ToString());
     }
 }

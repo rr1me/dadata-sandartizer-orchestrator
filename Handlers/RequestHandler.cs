@@ -41,6 +41,7 @@ public class RequestHandler
         var r = await httpClient.SendAsync(request);
 
         var responseBody = await r.Content.ReadAsStringAsync();
+
         _logger.LogDebug(responseBody);
         return responseBody;
     }

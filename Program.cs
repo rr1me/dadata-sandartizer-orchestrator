@@ -9,6 +9,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<RequestHandler>();
+builder.Services.AddTransient<ErrorResponse>();
 
 builder.Services.AddCors(x => x.AddDefaultPolicy(x =>
 {
